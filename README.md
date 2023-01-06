@@ -1,7 +1,15 @@
 ## 简介
 
-使用 Gin 创建一个 web 项目.
+零基础使用 Gin 创建一个 web 项目.附带教程
 
+本项目经过我公司线上验证，完善了日志监控系统，提供了通过golang并发特性提高性能的demo
+
+## 项目重点
+
+- service/list.go中详细展示了 golang 协程 通道  waitgroup 锁 组合用法，来实现数据并发处理的逻辑
+- service/list.go中展示了 临时对象池和 本地缓存 优化性能的方法
+- logrus日志 结合 sentry 进行时事报警
+- logrus日志 实时写入es
 
 教程在项目根目录的pdf中，从零开始所有细节都有讲解
 

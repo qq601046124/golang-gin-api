@@ -35,6 +35,10 @@ func runServer() {
 
 	// 初始化空的服务器
 	app := gin.New()
+
+	// sentry 报警平台 Init,必须再app之后初始化
+	model.InitSentry(app)
+
 	// 保存中间件
 	middlewares := []gin.HandlerFunc{
 		middleware.RequestID(),

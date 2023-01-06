@@ -8,6 +8,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
+	"github.com/orandin/sentrus"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -76,6 +77,38 @@ func (c *Config) InitLog() {
 	case "error":
 		logrus.SetLevel(logrus.ErrorLevel)
 	}
+
+	// 可以设置日志单独打印到elesticsearch
+	//esurl := viper.GetString("eslog.esurl")
+	//esusername := viper.GetString("eslog.username")
+	//espassword := viper.GetString("eslog.password")
+	//tr := &http.Transport{
+	//	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	//}
+	//httpsclient := &http.Client{Transport: tr} // 自定义transport
+	//// 创建elasticsearch客户端
+	//client, err := elastic.NewClient(elastic.SetHttpClient(httpsclient), elastic.SetSniff(false), elastic.SetURL(esurl), elastic.SetBasicAuth(esusername, espassword))
+	//if err != nil {
+	//	//logrus.Panic(err)
+	//	logrus.Info(err)
+	//}
+	//hostname, _ := os.Hostname()
+	//
+	//// 将logrus和elastic绑定，localhost 是指定该程序执行时的ip
+	//hook, err := elogrus.NewAsyncElasticHookWithFunc(client, hostname, logrus.DebugLevel, IndexName)
+	//if err != nil {
+	//	logrus.Info(err)
+	//}
+	//logrus.AddHook(hook)
+	logrus.AddHook(sentrus.NewHook(
+		[]logrus.Level{logrus.ErrorLevel},
+
+		// Optional: add tags to add in each Sentry event
+		sentrus.WithTags(map[string]string{"foo": "bar"}),
+
+		// Optional: set custom CaptureLog function
+		sentrus.WithCustomCaptureLog(sentrus.DefaultCaptureLog),
+	))
 
 	// log.logrus_file
 	logrusFile := viper.GetString("log.logrus_file")

@@ -1,7 +1,9 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"sync"
 
 	"tzh.com/web/model"
@@ -11,6 +13,20 @@ import (
 // 业务处理函数, 获取用户列表
 func ListUser(username string, offset, limit int) ([]*model.UserInfo, uint, error) {
 	infos := make([]*model.UserInfo, 0)
+	//调用 本地缓存提高性能
+	var localCacheRet []*model.UserInfo
+	localCacheKey := fmt.Sprintf("%s%s%d%d", "user_cache_", username)
+	cacheRet, err := model.LocalCache.Self.Get(localCacheKey)
+	if cacheRet != nil && err == nil {
+		err = json.Unmarshal(cacheRet, &localCacheRet)
+		if err != nil {
+			logrus.Errorf("json Unmarshal err:[%v]", err)
+		}
+
+		//localCacheRet.List = localCacheRet.List[(page-1)*size : size]
+		return localCacheRet, uint(len(localCacheRet)), nil
+	}
+
 	users, count, err := model.ListUser(username, offset, limit)
 	if err != nil {
 		return nil, count, err
